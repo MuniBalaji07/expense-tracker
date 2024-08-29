@@ -44,6 +44,20 @@ function App() {
           <button type="submit">Add Income</button>
        </form>
       </div>
+      <div className="balance">
+        <h2>YOUR BALANCE</h2>
+        <h3>{formatCurrency(calculateBalance())}</h3>
+      </div>
+      <div className="summary">
+        <div>
+          <h3>TOTAL INCOME</h3>
+          <p style={{ color: 'green'}}>{formatCurrency(calculateTolalIncome())}</p>
+        </div>
+        <div>
+        <h3>TOTAL EXPENSES</h3>
+        <p style={{ color: 'red'}}>{formatCurrency(calculateTolalIncome())}</p>
+        </div>
+      </div>
     </div> 
   )
 }

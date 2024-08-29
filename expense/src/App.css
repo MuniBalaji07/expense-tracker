@@ -12,6 +12,21 @@ h1 {
   color: skyblue;
   margin-bottom: 20px;
 }
+
+balance h3{
+  margin: 0;
+  font-size: 1.5rem;
+  color: green;
+}
+.summary{
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+}
+.summary div{
+  width: 45%;
+  text-align: left;
+}
 .income-input{
   margin: 20px 0;
   text-align: left;
