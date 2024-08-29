@@ -12,3 +12,23 @@ h1 {
   color: skyblue;
   margin-bottom: 20px;
 }
+.income-input{
+  margin: 20px 0;
+  text-align: left;
+}
+
+.income-input form label{
+  font-size: 1 rem;
+  color: grey;
+}
+
+.income-input form input{
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  margin-top: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+
+}
