@@ -14,7 +14,32 @@ function App() {
       setMethod('Cash'); 
     }
   };
-  
+
+  const addTransaction = (e) => {
+    e,preventDefault();
+    if(text && amount){
+      const parsedAmount = parseFloat(amount);
+      const totalIncome = incomes.reduce((acc, income) => acc + income.amount, 0);
+      const totalExpenses = transcations.reduce((acc, transaction) => acc + transaction.amount, 0);
+
+      if (parsedAmount > 0 || -parsedAmount <= remainingBalance) {
+        if (editing !== null) {
+          const updatedTransactions = transactions.map((transaction) =>
+            transaction.id === editing ? { ...transaction, text, amount: parsedAmount, method } : transaction
+          );
+          setTransactions(updatedTransactions);
+          setEditing(null);
+        } else {
+          const newTransaction = {
+            id: Math.random(),
+            text: text,
+            amount: parsedAmount,
+            method: method,
+          };
+    }
+
+  }
+}
   return(
     <div className="App">
       <h1>Expense Tracker</h1>
@@ -58,8 +83,37 @@ function App() {
         <p style={{ color: 'red'}}>{formatCurrency(calculateTolalIncome())}</p>
         </div>
       </div>
+      <div className="summary">
+        <div>
+          <h3>TOTAL INCOME</h3>
+          <p style={{color: 'green'}}>{formatCurrency(calculateTolalIncome())}</p>
+        </div>
+        <div>
+          <h3>TOTAL EXPENSE</h3>
+          <p style={{ color: 'red'}}>{formatCurrency(Math.abs(calculateTotalExpense()))}</p>
+        </div>
+      </div>
+      <div>
+        <div className="history">
+          <h3>History</h3>
+          <ul>
+            {incomes.map((income) => (
+              <li  key={income.id} className="plus">
+                Income Added <span>{formatCurrency(income.amount)}</span>({income.method})
+              </li>
+            ))}
+           {transcations.map((transaction) => (
+            <li key={transaction.id} className={transaction.amount > 0 ? 'plus' : 'minus'}>
+              {transaction.text} <span>{transaction.amount > 0 ? '+' : '-'}{formatCurrency(Math.abs(transaction.amount))}</span>({transaction.method})
+              <button onClick={() => editTransaction(transaction.id)} className="edit-btn">edit</button>
+              <button onClick={() => deleteTransaction(transaction.id)} className=""delete-btn>x</button>
+            </li>
+           ))}
+          </ul>
+        </div>
+      </div>
     </div> 
   )
 }
-
+}
 export default App;
