@@ -4,6 +4,9 @@ import './App.css';
 function App() {
   const[incomes, setIncomes] = useState([]);
   const[method, setMethod] = useState('Cash')
+  const [incomeAmount, setIncomeAmount] = useState('');
+  const [text, setText] = useState('');
+  const [amount, setAmount] = useState('');
   
 
   const addIncome = (e) => {
@@ -20,7 +23,8 @@ function App() {
     if(text && amount){
       const parsedAmount = parseFloat(amount);
       const totalIncome = incomes.reduce((acc, income) => acc + income.amount, 0);
-      const totalExpenses = transcations.reduce((acc, transaction) => acc + transaction.amount, 0);
+      const totalExpenses = transactions.reduce((acc, transaction) => acc + transaction.amount, 0);
+      const remainingBalance = totalIncome -totalExpenses; 
 
       if (parsedAmount > 0 || -parsedAmount <= remainingBalance) {
         if (editing !== null) {
@@ -36,10 +40,29 @@ function App() {
             amount: parsedAmount,
             method: method,
           };
+          setTransactions([...transactions, newTransaction]);
+    }
+    setText('');
+    setAmount('');
+    setMethod('Cash');
+  }else{
+      alert('Insufficient balance for this expense.')
     }
 
   }
-}
+};
+
+ const deleteTransaction = (id) =>{
+  setTransactions(transactions.filter((transaction)))
+ };
+
+ const editTransaction = (id) => {
+  const transaction = transactions.find((transaction) => transaction.id === id);
+  setText(transaction.text);
+  setAmount(transaction.amount);
+  setMethod(transaction.method);
+  setEditing(id);
+};
   return(
     <div className="App">
       <h1>Expense Tracker</h1>
@@ -93,7 +116,7 @@ function App() {
           <p style={{ color: 'red'}}>{formatCurrency(Math.abs(calculateTotalExpense()))}</p>
         </div>
       </div>
-      <div>
+      
         <div className="history">
           <h3>History</h3>
           <ul>
@@ -102,18 +125,40 @@ function App() {
                 Income Added <span>{formatCurrency(income.amount)}</span>({income.method})
               </li>
             ))}
-           {transcations.map((transaction) => (
+           {transactions.map((transaction) => (
             <li key={transaction.id} className={transaction.amount > 0 ? 'plus' : 'minus'}>
               {transaction.text} <span>{transaction.amount > 0 ? '+' : '-'}{formatCurrency(Math.abs(transaction.amount))}</span>({transaction.method})
               <button onClick={() => editTransaction(transaction.id)} className="edit-btn">edit</button>
-              <button onClick={() => deleteTransaction(transaction.id)} className=""delete-btn>x</button>
+              <button onClick={() => deleteTransaction(transaction.id)} className="delete-btn">x</button>
             </li>
            ))}
           </ul>
         </div>
-      </div>
+        <div className="new-transaction">
+          <h3>{editing !== null ? 'Edit Transaction' : 'Add new transaction'}</h3>
+          <form onSubmit={addTransaction}>
+            <div>
+              <label htmlFor="text">Text</label>
+              <input type="text"
+              value={text}
+              onChange={(e)=> setText(e.target.value)}
+              placeholder="Enter text..."
+              />
+            </div>
+          </form>
+        </div>
+        <label htmlFor="amount">Amount</label>
+        <input 
+          type="number"
+          value={amount}
+          onChange={(e)=> setAmount(e.target.value)}
+          placeholder="Enter amount..."
+        
+        />
+        
+      
     </div> 
   )
 }
-}
+
 export default App;
