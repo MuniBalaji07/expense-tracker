@@ -63,6 +63,15 @@ function App() {
   setMethod(transaction.method);
   setEditing(id);
 };
+
+ const calculateTolalIncome = () => {
+   return incomes.reduce((acc, income) => acc + income.amount, 0).toFixed(2);
+ }
+ calculateBalance = () => {
+  const totalIncome = incomes.reduce((acc, income) => acc + income.amount, 0);
+  const totalExpenses = transactions.reduce((acc, transaction) => acc + transaction.amount, 0);
+  return (totalIncome - Math.abs(totalExpenses)).toFixed(2);
+ };
   return(
     <div className="App">
       <h1>Expense Tracker</h1>
@@ -116,49 +125,60 @@ function App() {
           <p style={{ color: 'red'}}>{formatCurrency(Math.abs(calculateTotalExpense()))}</p>
         </div>
       </div>
-      
-        <div className="history">
-          <h3>History</h3>
-          <ul>
-            {incomes.map((income) => (
-              <li  key={income.id} className="plus">
-                Income Added <span>{formatCurrency(income.amount)}</span>({income.method})
-              </li>
-            ))}
-           {transactions.map((transaction) => (
+      <div className="history">
+        <h3>History</h3>
+        <ul>
+          {incomes.map((income) => (
+            <li  key={income.id} className="plus">
+              Income Added <span>{formatCurrency(income.amount)}</span>({income.method})
+            </li>
+          ))}
+          {transactions.map((transaction) => (
             <li key={transaction.id} className={transaction.amount > 0 ? 'plus' : 'minus'}>
               {transaction.text} <span>{transaction.amount > 0 ? '+' : '-'}{formatCurrency(Math.abs(transaction.amount))}</span>({transaction.method})
               <button onClick={() => editTransaction(transaction.id)} className="edit-btn">edit</button>
               <button onClick={() => deleteTransaction(transaction.id)} className="delete-btn">x</button>
             </li>
-           ))}
-          </ul>
-        </div>
-        <div className="new-transaction">
-          <h3>{editing !== null ? 'Edit Transaction' : 'Add new transaction'}</h3>
-          <form onSubmit={addTransaction}>
-            <div>
-              <label htmlFor="text">Text</label>
-              <input type="text"
+          ))}
+        </ul>
+      </div>
+      <div className="new-transaction">
+        <h3>{editing !== null ? 'Edit Transaction' : 'Add new transaction'}</h3>
+        <form onSubmit={addTransaction}>
+          <div>
+            <label htmlFor="text">Text</label>
+            <input 
+              type="text"
               value={text}
               onChange={(e)=> setText(e.target.value)}
               placeholder="Enter text..."
-              />
-            </div>
-          </form>
-        </div>
-        <label htmlFor="amount">Amount</label>
-        <input 
-          type="number"
-          value={amount}
-          onChange={(e)=> setAmount(e.target.value)}
-          placeholder="Enter amount..."
-        
-        />
-        
-      
+            />
+          </div>
+          <div> 
+            <label htmlFor="amount">Amount</label>
+            <input 
+              type="number"
+              value={amount}
+              onChange={(e)=> setAmount(e.target.value)}
+              placeholder="Enter amount..."
+            />
+          </div>
+          <div>
+            <label htmlFor="method">Method</label>
+            <select value={method} onChange={(e) => setMethod(e.target.value)}>
+              <option value="Cash">Cash</option>
+              <option value="Bank">Bank</option>
+              <option value="UPI">UPI</option>
+              <option value="Debit Card">Debit Card</option>
+              <option value="Credit Card">Credit Card</option>
+              <option value="Net Banking">Net Banking</option>
+            </select>
+          </div>
+          <button type="submit">{editing !== null ? 'Edit Transaction' : 'Add Transaction'}</button>
+        </form>
+      </div>
     </div> 
-  )
+  );
 }
 
 export default App;
