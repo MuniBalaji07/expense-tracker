@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import './App.css';
 
 function App() {
-  const[incomes, setIncomes] = useState([]);
-  const[method, setMethod] = useState('Cash')
+  const [incomes, setIncomes] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [incomeAmount, setIncomeAmount] = useState('');
   const [text, setText] = useState('');
   const [amount, setAmount] = useState('');
-  
+  const [method, setMethod] = useState('Cash'); 
+  const [editing, setEditing] = useState(null);
 
   const addIncome = (e) => {
     e.preventDefault();
@@ -19,12 +20,12 @@ function App() {
   };
 
   const addTransaction = (e) => {
-    e,preventDefault();
-    if(text && amount){
+    e.preventDefault();
+    if (text && amount) {
       const parsedAmount = parseFloat(amount);
       const totalIncome = incomes.reduce((acc, income) => acc + income.amount, 0);
       const totalExpenses = transactions.reduce((acc, transaction) => acc + transaction.amount, 0);
-      const remainingBalance = totalIncome -totalExpenses; 
+      const remainingBalance = totalIncome - totalExpenses;
 
       if (parsedAmount > 0 || -parsedAmount <= remainingBalance) {
         if (editing !== null) {
@@ -41,38 +42,47 @@ function App() {
             method: method,
           };
           setTransactions([...transactions, newTransaction]);
+        }
+        setText('');
+        setAmount('');
+        setMethod('Cash'); 
+      } else {
+        alert('Insufficient balance for this expense.');
+      }
     }
-    setText('');
-    setAmount('');
-    setMethod('Cash');
-  }else{
-      alert('Insufficient balance for this expense.')
-    }
+  };
 
-  }
-};
+  const deleteTransaction = (id) => {
+    setTransactions(transactions.filter((transaction) => transaction.id !== id));
+  };
 
- const deleteTransaction = (id) =>{
-  setTransactions(transactions.filter((transaction)))
- };
+  const editTransaction = (id) => {
+    const transaction = transactions.find((transaction) => transaction.id === id);
+    setText(transaction.text);
+    setAmount(transaction.amount);
+    setMethod(transaction.method);
+    setEditing(id);
+  };
 
- const editTransaction = (id) => {
-  const transaction = transactions.find((transaction) => transaction.id === id);
-  setText(transaction.text);
-  setAmount(transaction.amount);
-  setMethod(transaction.method);
-  setEditing(id);
-};
+  const calculateTotalIncome = () => {
+    return incomes.reduce((acc, income) => acc + income.amount, 0).toFixed(2);
+  };
 
- const calculateTolalIncome = () => {
-   return incomes.reduce((acc, income) => acc + income.amount, 0).toFixed(2);
- }
- calculateBalance = () => {
-  const totalIncome = incomes.reduce((acc, income) => acc + income.amount, 0);
-  const totalExpenses = transactions.reduce((acc, transaction) => acc + transaction.amount, 0);
-  return (totalIncome - Math.abs(totalExpenses)).toFixed(2);
- };
-  return(
+  const calculateTotalExpenses = () => {
+    return transactions.reduce((acc, transaction) => acc + transaction.amount, 0).toFixed(2);
+  };
+
+  const calculateBalance = () => {
+    const totalIncome = incomes.reduce((acc, income) => acc + income.amount, 0);
+    const totalExpenses = transactions.reduce((acc, transaction) => acc + transaction.amount, 0);
+    return (totalIncome - Math.abs(totalExpenses)).toFixed(2); 
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
+  };
+
+  return (
     <div className="App">
       <h1>Expense Tracker</h1>
       <div className="income-input">
@@ -99,43 +109,33 @@ function App() {
             </select>
           </div>
           <button type="submit">Add Income</button>
-       </form>
+        </form>
       </div>
       <div className="balance">
         <h2>YOUR BALANCE</h2>
-        <h3>{formatCurrency(calculateBalance())}</h3>
+        <h3>{formatCurrency(calculateBalance())}</h3> 
       </div>
       <div className="summary">
         <div>
           <h3>TOTAL INCOME</h3>
-          <p style={{ color: 'green'}}>{formatCurrency(calculateTolalIncome())}</p>
+          <p style={{ color: 'green' }}>{formatCurrency(calculateTotalIncome())}</p>
         </div>
         <div>
-        <h3>TOTAL EXPENSES</h3>
-        <p style={{ color: 'red'}}>{formatCurrency(calculateTolalIncome())}</p>
-        </div>
-      </div>
-      <div className="summary">
-        <div>
-          <h3>TOTAL INCOME</h3>
-          <p style={{color: 'green'}}>{formatCurrency(calculateTolalIncome())}</p>
-        </div>
-        <div>
-          <h3>TOTAL EXPENSE</h3>
-          <p style={{ color: 'red'}}>{formatCurrency(Math.abs(calculateTotalExpense()))}</p>
+          <h3>TOTAL EXPENSES</h3>
+          <p style={{ color: 'red' }}>{formatCurrency(Math.abs(calculateTotalExpenses()))}</p> {/* Displaying total expenses */}
         </div>
       </div>
       <div className="history">
         <h3>History</h3>
         <ul>
           {incomes.map((income) => (
-            <li  key={income.id} className="plus">
-              Income Added <span>{formatCurrency(income.amount)}</span>({income.method})
+            <li key={income.id} className="plus">
+              Income Added <span>{formatCurrency(income.amount)}</span> ({income.method})
             </li>
           ))}
           {transactions.map((transaction) => (
             <li key={transaction.id} className={transaction.amount > 0 ? 'plus' : 'minus'}>
-              {transaction.text} <span>{transaction.amount > 0 ? '+' : '-'}{formatCurrency(Math.abs(transaction.amount))}</span>({transaction.method})
+              {transaction.text} <span>{transaction.amount > 0 ? '+' : '-'}{formatCurrency(Math.abs(transaction.amount))}</span> ({transaction.method})
               <button onClick={() => editTransaction(transaction.id)} className="edit-btn">edit</button>
               <button onClick={() => deleteTransaction(transaction.id)} className="delete-btn">x</button>
             </li>
@@ -147,19 +147,19 @@ function App() {
         <form onSubmit={addTransaction}>
           <div>
             <label htmlFor="text">Text</label>
-            <input 
+            <input
               type="text"
               value={text}
-              onChange={(e)=> setText(e.target.value)}
+              onChange={(e) => setText(e.target.value)}
               placeholder="Enter text..."
             />
           </div>
-          <div> 
+          <div>
             <label htmlFor="amount">Amount</label>
-            <input 
+            <input
               type="number"
               value={amount}
-              onChange={(e)=> setAmount(e.target.value)}
+              onChange={(e) => setAmount(e.target.value)}
               placeholder="Enter amount..."
             />
           </div>
@@ -177,7 +177,7 @@ function App() {
           <button type="submit">{editing !== null ? 'Edit Transaction' : 'Add Transaction'}</button>
         </form>
       </div>
-    </div> 
+    </div>
   );
 }
 
